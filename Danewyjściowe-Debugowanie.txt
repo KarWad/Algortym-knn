@@ -1,0 +1,13 @@
+﻿„ID.exe” (CoreCLR: DefaultDomain): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Private.CoreLib.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Users\Karolina\source\repos\ID\ID\bin\Debug\net5.0\ID.dll”. Symbole zostały załadowane.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Runtime.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.IO.FileSystem.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Console.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Linq.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Memory.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Runtime.InteropServices.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Threading.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Collections.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+„ID.exe” (CoreCLR: clrhost): załadowano „C:\Program Files\dotnet\shared\Microsoft.NETCore.App\5.0.7\System.Text.Encoding.Extensions.dll”. Pominięto ładowanie symboli. Moduł jest zoptymalizowany i włączono opcję debugera „Tylko mój kod”.
+Program „[3836] ID.exe: Śledzenie programu” zakończył działanie z kodem 0 (0x0).
+Program „[3836] ID.exe” zakończył działanie z kodem 0 (0x0).

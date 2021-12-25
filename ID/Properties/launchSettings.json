@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ID": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Reuters"
+    }
+  }
+}
