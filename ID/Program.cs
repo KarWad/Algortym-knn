@@ -581,7 +581,7 @@ public class RecursiveFileProcessor
                                                         tmpDecyzja = decyzje[0, w];
                                                         for (int we = 0; we < k; we++) 
                                                         {
-                                                            for (int ss = 0; ss < westgermany.GetLength(0); ss++) 
+                                                            for (int ss = 0; ss < usaknn.GetLength(0); ss++) 
                                                             {
                                                                 bool wystepuje = true;
                                                                 for (int y = 0; y < k; y++) 
@@ -595,10 +595,58 @@ public class RecursiveFileProcessor
                                                                     {
                                                                         wystepuje = false;
                                                                     }
+
+                                                                    if (usaknn[ss, usaknn.GetLength(1) - 1] == tmpDecyzja && wystepuje == false)
+                                                                    
+                                                                    {
+                                                                        float tmpRoznica = tmpDecyzja - obliczoneD[i, ss];
+                                                                        if (tmpRoznica < 0) 
+                                                                        {
+                                                                            tmpRoznica *= (-1);
+                                                                        }
+                                                                        najblizszeWartości[0, we] = obliczoneD[i, ss];
+                                                                        najblizszeWartości[1, we] = ss;
+                                                                        for (int ii = 0; ii < usaknn.GetLength(0); i++)
+                                                                        {
+                                                                            for (int yy = 0; yy < k; yy++) 
+                                                                            {
+                                                                                if (najblizszeWartości[1, yy] == ii)
+                                                                                {
+                                                                                    wystepuje = true;
+                                                                                    yy = k;
+                                                                                }
+                                                                                else 
+                                                                                {
+                                                                                    wystepuje = false;
+                                                                                }
+                                                                            }if (usaknn[ii, usaknn.GetLength(1) - 1] == tmpDecyzja && wystepuje == false) 
+                                                                            {
+                                                                                float tmpRoznica2 = tmpDecyzja - obliczoneD[i, ii];
+                                                                                if (tmpRoznica2 < 2)
+                                                                                {
+                                                                                    tmpRoznica2 *= (-1);
+                                                                                }
+                                                                                if (tmpRoznica2 < tmpRoznica) 
+                                                                                {
+                                                                                    tmpRoznica = tmpRoznica2;
+                                                                                    najblizszeWartości[0, we] = obliczoneD[i, ii];
+                                                                                    najblizszeWartości[1, we] = ii;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
+                                                            }float tmpSuma = 0;
+                                                            for (int g = 0; g < k; g++) 
+                                                            {
+                                                                tmpSuma = tmpSuma + najblizszeWartości[0, g];
                                                             }
+                                                            sklasyfikowane[i + 1, w] = tmpSuma;
                                                         }
                                                     }
+                                                }for (int i = 0; i < westgermanyknn.GetLength(0) + 1; i++) 
+                                                {
+
                                                 }
 
 
