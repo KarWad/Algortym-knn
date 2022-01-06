@@ -26,9 +26,12 @@ public class RecursiveFileProcessor
     public static int canada = 0;
     public static int japan = 0;
     public static int wszystkieK = 0;
+    public static int TestK = 0;
+    public static int TrainK = 0;
 
     private static int i;
-
+    private static float[,] SystemTreningowy;
+    private static float[,] SystemTestowy;
 
     public static void Main(string[] args)
     {
@@ -43,6 +46,10 @@ public class RecursiveFileProcessor
             {
                 // This path is a directory
                 ProcessDirectory(path);
+            }
+            else if (!(File.Exists(path) && !Directory.Exists(path)))    // this code runs when all  app args fails
+            {
+                ProcessDirectory(Environment.CurrentDirectory + @"\Reuters");  //just checks %CD%\Reuters
             }
             else
             {
@@ -60,6 +67,9 @@ public class RecursiveFileProcessor
         Console.WriteLine("Ilosc artykulow z Canada " + canada);
         Console.WriteLine("Ilosc artykulow z Japan " + japan);
         Console.WriteLine("Ilość artykułów razem:" + wszystkieK);
+
+        Console.WriteLine("Zbiór Testowy:" + TestK);
+        Console.WriteLine("Zbiór Uczący:" + TrainK);
         Console.ReadLine();
     }
 
@@ -70,7 +80,9 @@ public class RecursiveFileProcessor
         // Process the list of files found in the directory.
         string[] fileEntries = Directory.GetFiles(targetDirectory);
         foreach (string fileName in fileEntries)
+        {
             ProcessFile(fileName);
+        }
 
         // Recurse into subdirectories of this directory.
         string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
@@ -78,6 +90,8 @@ public class RecursiveFileProcessor
             ProcessDirectory(subdirectory);
     }
 
+
+  
     // Insert logic for processing found files here.
     public static void ProcessFile(string path)
     {
@@ -105,6 +119,113 @@ public class RecursiveFileProcessor
         }
         Console.WriteLine(allp);
 
+
+        //k-NN
+        float[,] wczytajsystem(string path)
+        {
+            float[,] systemdecyzyjny;
+            //var odpowiedzialny za czytanie każdej linijki czytanego systemu
+            var linie = System.IO.File.ReadAllLines(path);
+            int ilosckolumn = 0, iloscwierszy = 0;
+            //Funkcja do usuwania pustych znaków
+            var linia2 = linie[0].Trim();
+            //Funkcja split dzieli linie na kolejne na podstawie określonego znaku, który tutaj jest spacją
+            var liczby2 = linia2.Split(' ');
+            iloscwierszy = linie.Length;
+            ilosckolumn = liczby2.Length;
+            systemdecyzyjny = new float[iloscwierszy, ilosckolumn];
+            //wczytywanie systemu do tablicy
+            for (int i = 0; i < linie.Length; i++)
+            {
+                var linia = linie[i].Trim();
+                var liczby = linia.Split();
+                for (int j = 0; j < liczby.Length; j++)
+                {
+                    //Usuwamy puste znaki
+                    systemdecyzyjny[i, j] = float.Parse(liczby[j].Trim());
+                }
+            }
+            return systemdecyzyjny;
+        }
+        //Metoda która określa maksymalną ilość sąsiadów, którą możemy wybrać do naszego programu
+        //Metoda Jakie decyzje zwraca tablice decyzji i ich krotności
+        float[,] Jakiedecyzje(float[,] systemDoWczytywania)
+        {
+            //lista która przechowuje decyzje w wczytanym systemie
+            var listaDecyzji = new List<float>();
+            for (int i = 0; i < systemDoWczytywania.GetLength(0); i++)
+            {
+                //Pętla która wyszukuje deczyje
+                bool wystepuje = false;
+                for (int w = 0; w < listaDecyzji.Count; w++)
+                {
+                    if (systemDoWczytywania[i, systemDoWczytywania.GetLength(1) - 1] == listaDecyzji[w])
+                    {
+                        //Nie dodajemy decyzji występującej na danej liście
+                        wystepuje = true;
+                        w = listaDecyzji.Count;
+                    }
+                }
+                if (wystepuje == false)
+                {
+                    listaDecyzji.Add(systemDoWczytywania[i, systemDoWczytywania.GetLength(1) - 1]);
+                }
+            }//Pobieramy długość listy w celu stworzenia tablicy która będzie zwracana z metody
+            int ileKolumn = listaDecyzji.Count;
+            //pierwszy wiersz przechowuje wartość decyzji a drugi jej krotność
+            float[,] decyzjeIIchIlosc = new float[2, ileKolumn];
+            for (int i = 0; i < decyzjeIIchIlosc.GetLength(1); i++)
+            {
+                //Przypisywanie wartości decyzji
+                decyzjeIIchIlosc[0, i] = listaDecyzji[i];
+            }
+            for (int i = 0; i < decyzjeIIchIlosc.GetLength(1); i++)
+            {
+                //Przypisywanie krotności decyzji
+                float krotnosc = 0;
+                for (int ss = 0; ss < systemDoWczytywania.GetLength(0); ss++)
+                {
+                    if (listaDecyzji[i] == systemDoWczytywania[ss, systemDoWczytywania.GetLength(1) - 1])
+                    {
+                        //Jeżeli decyzja się powtarza do zwiększamy jej krotność o 1
+                        krotnosc++;
+                    }
+                }
+                decyzjeIIchIlosc[1, i] = krotnosc;
+            }
+            return decyzjeIIchIlosc;
+
+        }
+
+         void systemTreningowy(string path)
+        {
+            //Zapisujemy ścieżkę do pliku
+            path = File.ReadAllText(path);
+            SystemTreningowy = wczytajsystem(path);
+            float kMAX = 0;
+            //Ustalamy maksymalną ilość sąsiadów dla któych może działać program
+            float[,] analiza = Jakiedecyzje(SystemTreningowy);
+
+            for (int i = 0; i < analiza.GetLength(1); i++)
+            //Maksymalna ilość sąsiadów to ilość powtórzeń danej decyzji
+            {
+                if (analiza[1, i] > kMAX)
+                {
+                    kMAX = analiza[1, i];
+                }
+            }
+        }
+        void systemTestowy(string path)
+        {
+            path = File.ReadAllText(path);
+            SystemTestowy = wczytajsystem(path);
+        }
+
+        private void KtoraMetryka() 
+        {
+
+        } 
+
         //-----------------------------------------------------
         int pwestgermany = 0;
         int pusa = 0;
@@ -112,16 +233,19 @@ public class RecursiveFileProcessor
         int puk = 0;
         int pcanada = 0;
         int pjapan = 0;
-
+        float [,]ptestk;
+        float [,]ptraink;
+        int k;
+        int ktorametryka;
         //-----------------------------------------------------
+
 
         for (int i = 0; i < productList.Count; i++)
         {
-
-            
-
             if (productList[i].BODY != null)
             {
+                //Pokaż aktualnie przetwarzany plik
+                Console.WriteLine("Aktualnie przetwarzany plik " + path);
 
                 //Liczenie liter w danym tekście
                 int numberOfLetters = productList[i].BODY.Count(c => char.IsLetter(c));
@@ -157,9 +281,12 @@ public class RecursiveFileProcessor
                 Console.WriteLine("Ilość Lini w danym tekście: " + NumberOfLines);
                 Console.WriteLine(" ");
 
+
                 int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
                 allp += x;
 
+
+            
 
 
             }
@@ -182,11 +309,11 @@ public class RecursiveFileProcessor
                 usa++;
                 if (productList[i].BODY != null)
                 {
-                   
+
 
                     int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
                     pusa += x;
-            
+
                 }
             }
             else if (String.Equals(productList[i].PLACES, "france "))
@@ -233,11 +360,9 @@ public class RecursiveFileProcessor
                     pjapan += x;
                 }
 
-              
+
             }
-
-
-
         }
+      
     }
 }
