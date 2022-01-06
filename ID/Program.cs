@@ -28,8 +28,8 @@ public class RecursiveFileProcessor
     public static int canada = 0;
     public static int japan = 0;
     public static int wszystkieK = 0;
-    public static int TestK = 0;
-    public static int TrainK = 0;
+    public static int k = 10;
+
 
     private static int i;
     private static float[,] SystemTreningowy;
@@ -70,9 +70,6 @@ public class RecursiveFileProcessor
         Console.WriteLine("Ilosc artykulow z Canada " + canada);
         Console.WriteLine("Ilosc artykulow z Japan " + japan);
         Console.WriteLine("Ilość artykułów razem:" + wszystkieK);
-
-        Console.WriteLine("Zbiór Testowy:" + TestK);
-        Console.WriteLine("Zbiór Uczący:" + TrainK);
         Console.ReadLine();
     }
 
@@ -240,19 +237,13 @@ public static void ProcessDirectory(string targetDirectory)
                 }
             }
         }
+        
         void systemTestowy(string path)
         {
             path = File.ReadAllText(path);
             SystemTestowy = wczytajsystem(path);
+          
         }
-
-
-
-
-
-
-
-
 
 
         float[,] ObliczD (float[,] systemTestowy, float[,] systemTreningowy) 
@@ -292,6 +283,144 @@ public static void ProcessDirectory(string targetDirectory)
             }
             return obliczoneD;
         }
+        float[,] KlasyfikujKNN (float[,] obliczoneD, float kNN) 
+        {
+            //Tablica która przychowuje dane o decyzjach systemu testowego
+            float[,] decyzje = Jakiedecyzje(SystemTestowy); //Decyzje 
+            float[,] sklasyfikowane = new float[SystemTestowy.GetLength(0) + 1, decyzje.GetLength(1) + 1]; //Informacje o mocy głosowania danej klasy
+            float tmpDecyzja; // przyznana decyzja
+            for (int i = 0; i < decyzje.GetLength(1); i++) 
+            {
+                sklasyfikowane[0, i] = -1; //wypełnienie wartościami -1
+            }
+            for (int i = 0; i < decyzje.GetLength(1); i++)
+            {
+                sklasyfikowane[0, i] = decyzje[0, i]; //wypełnienie decyzjami ponieważ będzie w tej tablicy deskryptor nieużywany który nie wystąpi w działaniu
+            }
+            for(int i = 0; i < SystemTestowy.GetLength(0); i++)
+            {
+                for (int w = 0; w < decyzje.GetLength(1); w++) 
+                {
+                    //Wyszukiwanie najbliższych wartości - tablica "najbliższe wartości" o ilości kolumn równej ilości poszukiwanych sąsiadów 
+                    float[,] najblizszewartosci = new float[2, k];
+                    for (int u = 0; u < k; u++) 
+                    {
+                        najblizszewartosci[0, u] = 999;
+                        najblizszewartosci[1, u] = 999;///Przyjemuje wartosc 999 
+                    }
+                    tmpDecyzja = decyzje[0, w];
+                    for (int we = 0; we < k; we++) 
+                    {
+                        for (int ss = 0; ss < SystemTreningowy.GetLength(0); ss++)
+                        {
+                            bool wystepuje = true;
+                            for(int y =0; y <k; y++) 
+                            {
+                                if (najblizszewartosci[1, y] == ss)
+                                {
+                                    wystepuje = true;
+                                    y = k;
+                                }
+                                else 
+                                {
+                                    wystepuje = false;
+                                }
+                            }
+                            if (SystemTreningowy[ss, SystemTreningowy.GetLength(1) - 1] == tmpDecyzja && wystepuje == false) 
+                                //Bierzemy sąsiadow z tego samego konceptu - sprawdzamy decyzje
+                            {
+                                float tmpRoznica = tmpDecyzja - obliczoneD[i, ss];
+                                //Sprawdzamy odległość od decyzji
+                                if (tmpRoznica < 0) 
+                                {
+                                    tmpRoznica = tmpRoznica * (-1);
+                                }
+                                najblizszewartosci[0, we] = obliczoneD[i, ss];
+                                najblizszewartosci[1, we] = ss;
+                                //Zapisujemy z którego obiektu pochodziło
+                                for (int ii = 0; ii < SystemTreningowy.GetLength(0); i++) 
+                                {
+                                    for (int yy = 0; yy < k; yy++) 
+                                    {
+                                        if (najblizszewartosci[1, yy] == ii)
+                                        {
+                                            wystepuje = true;
+                                            yy = k;
+                                        }
+                                        else 
+                                        {
+                                            wystepuje = false;
+                                        }
+                                    }
+                                    if (SystemTreningowy[ii, SystemTreningowy.GetLength(1) - 1] == tmpDecyzja && wystepuje == false) 
+                                    {
+                                        float tmpRoznica2 = tmpDecyzja - obliczoneD[i, ii];
+                                        if (tmpRoznica2 < 0) 
+                                        {
+                                            tmpRoznica2 = tmpRoznica2 * (-1);
+                                        }
+                                        if (tmpRoznica2 < tmpRoznica) 
+                                        {
+                                            tmpRoznica = tmpRoznica2;
+                                            najblizszewartosci[0, we] = obliczoneD[i, ii];
+                                            najblizszewartosci[1, we] = ii;
+                                        }
+                                    }
+                                }
+
+                            }
+                           
+                        }
+                    }
+                    float tmpSuma = 0; //Obliczanie mocy jaką ma nasza klasa
+                    for (int g = 0; g < k; g++) 
+                    {
+                        tmpSuma = tmpSuma + najblizszewartosci[0, g];
+                    }
+                    sklasyfikowane[i + 1, w] = tmpSuma; //Tę moc zapisujemy do tablicy sklasyfikowane, dzięki której będziemy mogli przydzielić decyzje
+                }
+            }
+            for (int i = 0; i < SystemTestowy.GetLength(0) + 1; i++)
+            {
+                //Przynawanie Decyzji
+                //Wyższa wartość otrzymuje przypisaną decyzje
+                //Decyzje są przypisane w pierwszym wierszu
+                //Decyzja przyznana umieszczana jest w ostatniej kolumnie
+                float tmpNajmniejszaWartosc = sklasyfikowane[i, 0];
+                sklasyfikowane[i, decyzje.GetLength(1)] = sklasyfikowane[0, 0];
+                for (int s = 0; s < decyzje.GetLength(1); s++) 
+                {
+                    float tmpNajmniejszaWartosc2 = sklasyfikowane[i, s];
+                    if (tmpNajmniejszaWartosc2 < tmpNajmniejszaWartosc)
+                    {
+                        sklasyfikowane[i, decyzje.GetLength(1)] = sklasyfikowane[0, s];
+                    }
+                    else if (tmpNajmniejszaWartosc2 == tmpNajmniejszaWartosc) 
+                    {
+                        //wykorzystujemy wartość -1 która będzie oznaczać, że obiekt nie został uchwycony (aby nie było zdziewienia, że są dwie te same wartości)
+                        sklasyfikowane[i, decyzje.GetLength(1)] = -1; 
+                    }
+                }
+            }
+            return sklasyfikowane;
+        }
+
+
+        float[,] SprawdzPoprawnoscKlasyfikacji(float[,] sklasyfikowane) 
+        {
+            float[,] jakSklasyfikowane = new float[SystemTestowy.GetLength(0), 1];
+            for (int i = 0; i < SystemTestowy.GetLength(0); i++) 
+            {
+                if (sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] == SystemTestowy[i, SystemTestowy.GetLength(1)]- 1)
+                    {
+                    jakSklasyfikowane[i, 0] = 1;
+                }
+                if (sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] != SystemTestowy[i, SystemTestowy.GetLength(1) - 1] && sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] != -1) 
+                {
+
+                }
+            }
+        }
 
         //-----------------------------------------------------
         int pwestgermany = 0;
@@ -300,10 +429,6 @@ public static void ProcessDirectory(string targetDirectory)
         int puk = 0;
         int pcanada = 0;
         int pjapan = 0;
-        float [,]ptestk;
-        float [,]ptraink;
-        int k;
-        int ktorametryka;
         //-----------------------------------------------------
 
 
