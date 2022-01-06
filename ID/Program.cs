@@ -97,7 +97,7 @@ public class RecursiveFileProcessor
 
     // Process all files in the directory passed in, recurse on any directories
     // that are found, and process the files they contain.
-public static void ProcessDirectory(string targetDirectory)
+    public static void ProcessDirectory(string targetDirectory)
     {
         // Process the list of files found in the directory.
         string[] fileEntries = Directory.GetFiles(targetDirectory);
@@ -113,7 +113,7 @@ public static void ProcessDirectory(string targetDirectory)
     }
 
 
-  
+
     // Insert logic for processing found files here.
     public static void ProcessFile(string path)
     {
@@ -219,7 +219,7 @@ public static void ProcessDirectory(string targetDirectory)
 
         }
 
-         void systemTreningowy(string path)
+        void systemTreningowy(string path)
         {
             //Zapisujemy ścieżkę do pliku
             path = File.ReadAllText(path);
@@ -237,59 +237,59 @@ public static void ProcessDirectory(string targetDirectory)
                 }
             }
         }
-        
+
         void systemTestowy(string path)
         {
             path = File.ReadAllText(path);
             SystemTestowy = wczytajsystem(path);
-          
+
         }
 
 
-        float[,] ObliczD (float[,] systemTestowy, float[,] systemTreningowy) 
+        float[,] ObliczD(float[,] systemTestowy, float[,] systemTreningowy)
         {
             //Ilość obiektów systemu treningowego będzie teraz ilością kolumn
             float[,] obliczoneD = new float[systemTestowy.GetLength(0), systemTreningowy.GetLength(0)];
-        
-            for (int i = 0; i < systemTestowy.GetLength(0); i++) 
+
+            for (int i = 0; i < systemTestowy.GetLength(0); i++)
             {
                 for (int w = 0; w < systemTreningowy.GetLength(0); w++)
                 {
                     //Zmienna przechowuje wartośc działania, porównania jednego obiektu systemu treningowego z systemem testowym
                     float tmp = 0;
-                    for (int ss = 0; ss < systemTestowy.GetLength(0); ss++) 
+                    for (int ss = 0; ss < systemTestowy.GetLength(0); ss++)
                     {
                         tmp = tmp + EuclideanDistance(systemTestowy[i, ss], systemTreningowy[i, ss], systemTestowy[i, ss], systemTreningowy[w, ss]);
-                        if (tmp < 0) 
+                        if (tmp < 0)
                         {
                             tmp = tmp * (-1);
                         }
                         float tmp2 = ManhattanDistance(systemTestowy[i, ss], systemTreningowy[i, ss], systemTestowy[i, ss], systemTreningowy[w, ss]);
-                        if (tmp2< 0) 
+                        if (tmp2 < 0)
                         {
                             tmp2 = tmp2 * (-1);
                         }
                         tmp = tmp + tmp2;
-                        float tmp3 = ChebyshevDistance(systemTestowy[i, ss],systemTreningowy[w,ss]);
-                        if (tmp3< 0) 
+                        float tmp3 = ChebyshevDistance(systemTestowy[i, ss], systemTreningowy[w, ss]);
+                        if (tmp3 < 0)
                         {
                             tmp3 = tmp3 * (-1);
                         }
-                        tmp = tmp+ tmp2 + tmp3;
+                        tmp = tmp + tmp2 + tmp3;
                     }
                     obliczoneD[i, w] = tmp;
                 }
-               
+
             }
             return obliczoneD;
         }
-        float[,] KlasyfikujKNN (float[,] obliczoneD, float kNN) 
+        float[,] KlasyfikujKNN(float[,] obliczoneD, float kNN)
         {
             //Tablica która przychowuje dane o decyzjach systemu testowego
             float[,] decyzje = Jakiedecyzje(SystemTestowy); //Decyzje 
             float[,] sklasyfikowane = new float[SystemTestowy.GetLength(0) + 1, decyzje.GetLength(1) + 1]; //Informacje o mocy głosowania danej klasy
             float tmpDecyzja; // przyznana decyzja
-            for (int i = 0; i < decyzje.GetLength(1); i++) 
+            for (int i = 0; i < decyzje.GetLength(1); i++)
             {
                 sklasyfikowane[0, i] = -1; //wypełnienie wartościami -1
             }
@@ -297,69 +297,69 @@ public static void ProcessDirectory(string targetDirectory)
             {
                 sklasyfikowane[0, i] = decyzje[0, i]; //wypełnienie decyzjami ponieważ będzie w tej tablicy deskryptor nieużywany który nie wystąpi w działaniu
             }
-            for(int i = 0; i < SystemTestowy.GetLength(0); i++)
+            for (int i = 0; i < SystemTestowy.GetLength(0); i++)
             {
-                for (int w = 0; w < decyzje.GetLength(1); w++) 
+                for (int w = 0; w < decyzje.GetLength(1); w++)
                 {
                     //Wyszukiwanie najbliższych wartości - tablica "najbliższe wartości" o ilości kolumn równej ilości poszukiwanych sąsiadów 
                     float[,] najblizszewartosci = new float[2, k];
-                    for (int u = 0; u < k; u++) 
+                    for (int u = 0; u < k; u++)
                     {
                         najblizszewartosci[0, u] = 999;
                         najblizszewartosci[1, u] = 999;///Przyjemuje wartosc 999 
                     }
                     tmpDecyzja = decyzje[0, w];
-                    for (int we = 0; we < k; we++) 
+                    for (int we = 0; we < k; we++)
                     {
                         for (int ss = 0; ss < SystemTreningowy.GetLength(0); ss++)
                         {
                             bool wystepuje = true;
-                            for(int y =0; y <k; y++) 
+                            for (int y = 0; y < k; y++)
                             {
                                 if (najblizszewartosci[1, y] == ss)
                                 {
                                     wystepuje = true;
                                     y = k;
                                 }
-                                else 
+                                else
                                 {
                                     wystepuje = false;
                                 }
                             }
-                            if (SystemTreningowy[ss, SystemTreningowy.GetLength(1) - 1] == tmpDecyzja && wystepuje == false) 
-                                //Bierzemy sąsiadow z tego samego konceptu - sprawdzamy decyzje
+                            if (SystemTreningowy[ss, SystemTreningowy.GetLength(1) - 1] == tmpDecyzja && wystepuje == false)
+                            //Bierzemy sąsiadow z tego samego konceptu - sprawdzamy decyzje
                             {
                                 float tmpRoznica = tmpDecyzja - obliczoneD[i, ss];
                                 //Sprawdzamy odległość od decyzji
-                                if (tmpRoznica < 0) 
+                                if (tmpRoznica < 0)
                                 {
                                     tmpRoznica = tmpRoznica * (-1);
                                 }
                                 najblizszewartosci[0, we] = obliczoneD[i, ss];
                                 najblizszewartosci[1, we] = ss;
                                 //Zapisujemy z którego obiektu pochodziło
-                                for (int ii = 0; ii < SystemTreningowy.GetLength(0); i++) 
+                                for (int ii = 0; ii < SystemTreningowy.GetLength(0); i++)
                                 {
-                                    for (int yy = 0; yy < k; yy++) 
+                                    for (int yy = 0; yy < k; yy++)
                                     {
                                         if (najblizszewartosci[1, yy] == ii)
                                         {
                                             wystepuje = true;
                                             yy = k;
                                         }
-                                        else 
+                                        else
                                         {
                                             wystepuje = false;
                                         }
                                     }
-                                    if (SystemTreningowy[ii, SystemTreningowy.GetLength(1) - 1] == tmpDecyzja && wystepuje == false) 
+                                    if (SystemTreningowy[ii, SystemTreningowy.GetLength(1) - 1] == tmpDecyzja && wystepuje == false)
                                     {
                                         float tmpRoznica2 = tmpDecyzja - obliczoneD[i, ii];
-                                        if (tmpRoznica2 < 0) 
+                                        if (tmpRoznica2 < 0)
                                         {
                                             tmpRoznica2 = tmpRoznica2 * (-1);
                                         }
-                                        if (tmpRoznica2 < tmpRoznica) 
+                                        if (tmpRoznica2 < tmpRoznica)
                                         {
                                             tmpRoznica = tmpRoznica2;
                                             najblizszewartosci[0, we] = obliczoneD[i, ii];
@@ -369,11 +369,11 @@ public static void ProcessDirectory(string targetDirectory)
                                 }
 
                             }
-                           
+
                         }
                     }
                     float tmpSuma = 0; //Obliczanie mocy jaką ma nasza klasa
-                    for (int g = 0; g < k; g++) 
+                    for (int g = 0; g < k; g++)
                     {
                         tmpSuma = tmpSuma + najblizszewartosci[0, g];
                     }
@@ -388,17 +388,17 @@ public static void ProcessDirectory(string targetDirectory)
                 //Decyzja przyznana umieszczana jest w ostatniej kolumnie
                 float tmpNajmniejszaWartosc = sklasyfikowane[i, 0];
                 sklasyfikowane[i, decyzje.GetLength(1)] = sklasyfikowane[0, 0];
-                for (int s = 0; s < decyzje.GetLength(1); s++) 
+                for (int s = 0; s < decyzje.GetLength(1); s++)
                 {
                     float tmpNajmniejszaWartosc2 = sklasyfikowane[i, s];
                     if (tmpNajmniejszaWartosc2 < tmpNajmniejszaWartosc)
                     {
                         sklasyfikowane[i, decyzje.GetLength(1)] = sklasyfikowane[0, s];
                     }
-                    else if (tmpNajmniejszaWartosc2 == tmpNajmniejszaWartosc) 
+                    else if (tmpNajmniejszaWartosc2 == tmpNajmniejszaWartosc)
                     {
                         //wykorzystujemy wartość -1 która będzie oznaczać, że obiekt nie został uchwycony (aby nie było zdziewienia, że są dwie te same wartości)
-                        sklasyfikowane[i, decyzje.GetLength(1)] = -1; 
+                        sklasyfikowane[i, decyzje.GetLength(1)] = -1;
                     }
                 }
             }
@@ -406,155 +406,232 @@ public static void ProcessDirectory(string targetDirectory)
         }
 
 
-        float[,] SprawdzPoprawnoscKlasyfikacji(float[,] sklasyfikowane) 
+        float[,] SprawdzPoprawnoscKlasyfikacji(float[,] sklasyfikowane)
         {
             float[,] jakSklasyfikowane = new float[SystemTestowy.GetLength(0), 1];
-            for (int i = 0; i < SystemTestowy.GetLength(0); i++) 
+            for (int i = 0; i < SystemTestowy.GetLength(0); i++)
             {
-                if (sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] == SystemTestowy[i, SystemTestowy.GetLength(1)]- 1)
-                    {
+                if (sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] == SystemTestowy[i, SystemTestowy.GetLength(1)] - 1)
+                {
                     jakSklasyfikowane[i, 0] = 1;
                 }
-                if (sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] != SystemTestowy[i, SystemTestowy.GetLength(1) - 1] && sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] != -1) 
+                if (sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] != SystemTestowy[i, SystemTestowy.GetLength(1) - 1] && sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] != -1)
                 {
-
+                    jakSklasyfikowane[i, 0] = 0;
+                }
+                if (sklasyfikowane[i + 1, sklasyfikowane.GetLength(1) - 1] == -1)
+                {
+                    jakSklasyfikowane[i, 0] = -1;
                 }
             }
+            return jakSklasyfikowane;
         }
 
-        //-----------------------------------------------------
-        int pwestgermany = 0;
-        int pusa = 0;
-        int pfrance = 0;
-        int puk = 0;
-        int pcanada = 0;
-        int pjapan = 0;
-        //-----------------------------------------------------
-
-
-        for (int i = 0; i < productList.Count; i++)
+        float[,] MacierzPredykcji(float[,] tablicaPoprawnosci)
         {
-            if (productList[i].BODY != null)
+            float[,] decyzje = Jakiedecyzje(SystemTestowy);
+            int iloscKolumn = decyzje.GetLength(1);
+            int iloscWierszy = 6;
+            //Pierwszy wiersz będzie przechowywać decyzje, ostatni ich krotność, kolejne wiersze są potrzebne są do przechowywania obliczen do utworzenia macierzy predykcji
+            float[,] macierzPR = new float[iloscWierszy, iloscKolumn];
+            for (int i = 0; i < decyzje.GetLength(1); i++)
             {
-                //Pokaż aktualnie przetwarzany plik
-                Console.WriteLine("Aktualnie przetwarzany plik " + path);
-
-                //Liczenie liter w danym tekście
-                int numberOfLetters = productList[i].BODY.Count(c => char.IsLetter(c));
-                Console.WriteLine("Ilość liter w danym tekście: +" + numberOfLetters);
-
-                //Licczenie wyrazów w danym tekście
-                string articles = productList[i].BODY;
-                string[] words = productList[i].BODY.Split(' ');
-                Console.WriteLine("Ilość wyrazów w danym tekście: " + words.Length);
-
-                //Liczenie liczb w danym tekście
-                int NumberOfNumbers = productList[i].BODY.Count(c => Char.IsNumber(c));
-                Console.WriteLine("Ilość liczb w danym tekście: " + NumberOfNumbers);
-
-                //Liczenie znaków specjalnych w danym tekście
-                int NumberOfSpecialCharacters = articles.Count(c => !char.IsLetterOrDigit(c));
-                Console.WriteLine("Ilość znaków specjalnych w danym tekście: " + NumberOfSpecialCharacters);
-
-                //Liczenie wielkich liter w danym tekście
-                int NumberOfUpperLetters = productList[i].BODY.Count(c => char.IsUpper(c));
-                Console.WriteLine("Ilość wielkich liter w danym tekście: " + NumberOfUpperLetters);
-
-                //Liczenie małych liter w danym tekście
-                int NumberOfSmalLetters = productList[i].BODY.Count(c => char.IsLower(c));
-                Console.WriteLine("Ilość małych liter w danym tekście: " + NumberOfSmalLetters);
-
-                //Liczenie spacji w danym tekście
-                int NumberOfSpaces = productList[i].BODY.Count(c => char.IsWhiteSpace(c));
-                Console.WriteLine("Ilość spacji w danym tekście: " + NumberOfSpaces);
-
-                //liczenie lini tekstu w artykułach
-                int NumberOfLines = productList[i].BODY.Split('\n').Length;
-                Console.WriteLine("Ilość Lini w danym tekście: " + NumberOfLines);
-                Console.WriteLine(" ");
-
-
-                int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
-                allp += x;
-
-
-            
-
-
+                macierzPR[0, i] = decyzje[0, i];
+                macierzPR[5, i] = decyzje[1, i];
             }
-            if (String.Equals(productList[i].PLACES, "west-germany "))
+            float calkowitaIloscPoprawnieSklasyfikowanych = 0;
+            float calkowitaIloscSklasyfikowanych = 0;
+            float calkowitaIloscChwyconych = 0;
+            float iloscObiektow = SystemTestowy.GetLength(0);
+            for (int i = 0; i < decyzje.GetLength(1); i++)
             {
-                westgermany++;
-                wszystkieK++;
+                float poprawnieSklasyfikowany = 0;
+                float iloscChwyconych = 0;
+                float niechwycony = 0;
+                float liczbaObiektowKlasy = decyzje[1, i];
+                float blednieSklasyfikowany = 0;
+                for (int w = 0; w < SystemTestowy.GetLength(0); w++)
+                {
+                    if (decyzje[0, i] == SystemTestowy[w, SystemTestowy.GetLength(1) - 1])
+                    {
+                        if (tablicaPoprawnosci[w, 0] == 1)
+                        {
+                            poprawnieSklasyfikowany++;
+                            calkowitaIloscPoprawnieSklasyfikowanych++;
+                        }
+                        if (tablicaPoprawnosci[w, 0] == -1)
+                        {
+                            niechwycony++;
+                        }
+                    }
+                    if (decyzje[0, i] != SystemTestowy[w, SystemTestowy.GetLength(-1) - 1])
+                    {
+                        blednieSklasyfikowany++;
+                    }
+                }
+                iloscChwyconych = decyzje[1, i] - niechwycony;
+                calkowitaIloscChwyconych = calkowitaIloscChwyconych + iloscChwyconych;
+                float acc = poprawnieSklasyfikowany / iloscChwyconych;
+                float cov = iloscChwyconych / decyzje[1, i];
+                float tpr = poprawnieSklasyfikowany / (poprawnieSklasyfikowany + blednieSklasyfikowany);
+                macierzPR[1, i] = acc;
+                macierzPR[2, i] = cov;
+                macierzPR[3, i] = tpr;
+            }
+            float accGlobal = calkowitaIloscPoprawnieSklasyfikowanych / calkowitaIloscChwyconych;
+            float covGlobal = calkowitaIloscChwyconych / SystemTestowy.GetLength(0);
+            macierzPR[4, 0] = accGlobal;
+            macierzPR[4, 1] = covGlobal;
+            return macierzPR;
+
+            void Wyniki()
+            {
+                float[,] obliczoneD = ObliczD(SystemTestowy, SystemTreningowy);
+                float[,] sklasyfikowaneDecyzje = KlasyfikujKNN(obliczoneD, k);
+                float[,] poprawnoscklasyfikacji = SprawdzPoprawnoscKlasyfikacji(sklasyfikowaneDecyzje);
+                float[,] MacierzPred = MacierzPredykcji(poprawnoscklasyfikacji);
+            }
+
+            float[,] wynik;
+
+
+
+
+
+            //-----------------------------------------------------
+            int pwestgermany = 0;
+            int pusa = 0;
+            int pfrance = 0;
+            int puk = 0;
+            int pcanada = 0;
+            int pjapan = 0;
+            //-----------------------------------------------------
+
+
+            for (int i = 0; i < productList.Count; i++)
+            {
                 if (productList[i].BODY != null)
                 {
+                    //Pokaż aktualnie przetwarzany plik
+                    Console.WriteLine("Aktualnie przetwarzany plik " + path);
+
+                    //Liczenie liter w danym tekście
+                    int numberOfLetters = productList[i].BODY.Count(c => char.IsLetter(c));
+                    Console.WriteLine("Ilość liter w danym tekście: +" + numberOfLetters);
+
+                    //Licczenie wyrazów w danym tekście
+                    string articles = productList[i].BODY;
+                    string[] words = productList[i].BODY.Split(' ');
+                    Console.WriteLine("Ilość wyrazów w danym tekście: " + words.Length);
+
+                    //Liczenie liczb w danym tekście
+                    int NumberOfNumbers = productList[i].BODY.Count(c => Char.IsNumber(c));
+                    Console.WriteLine("Ilość liczb w danym tekście: " + NumberOfNumbers);
+
+                    //Liczenie znaków specjalnych w danym tekście
+                    int NumberOfSpecialCharacters = articles.Count(c => !char.IsLetterOrDigit(c));
+                    Console.WriteLine("Ilość znaków specjalnych w danym tekście: " + NumberOfSpecialCharacters);
+
+                    //Liczenie wielkich liter w danym tekście
+                    int NumberOfUpperLetters = productList[i].BODY.Count(c => char.IsUpper(c));
+                    Console.WriteLine("Ilość wielkich liter w danym tekście: " + NumberOfUpperLetters);
+
+                    //Liczenie małych liter w danym tekście
+                    int NumberOfSmalLetters = productList[i].BODY.Count(c => char.IsLower(c));
+                    Console.WriteLine("Ilość małych liter w danym tekście: " + NumberOfSmalLetters);
+
+                    //Liczenie spacji w danym tekście
+                    int NumberOfSpaces = productList[i].BODY.Count(c => char.IsWhiteSpace(c));
+                    Console.WriteLine("Ilość spacji w danym tekście: " + NumberOfSpaces);
+
+                    //liczenie lini tekstu w artykułach
+                    int NumberOfLines = productList[i].BODY.Split('\n').Length;
+                    Console.WriteLine("Ilość Lini w danym tekście: " + NumberOfLines);
+                    Console.WriteLine(" ");
 
 
                     int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
-                    pwestgermany += x;
+                    allp += x;
+
+
+
+
 
                 }
-            }
-            else if (String.Equals(productList[i].PLACES, "usa "))
-            {
-                wszystkieK++;
-                usa++;
-                if (productList[i].BODY != null)
+                if (String.Equals(productList[i].PLACES, "west-germany "))
                 {
+                    westgermany++;
+                    wszystkieK++;
+                    if (productList[i].BODY != null)
+                    {
 
 
-                    int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
-                    pusa += x;
+                        int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
+                        pwestgermany += x;
 
+                    }
                 }
-            }
-            else if (String.Equals(productList[i].PLACES, "france "))
-            {
-                france++;
-                wszystkieK++;
-                if (productList[i].BODY != null)
+                else if (String.Equals(productList[i].PLACES, "usa "))
                 {
+                    wszystkieK++;
+                    usa++;
+                    if (productList[i].BODY != null)
+                    {
 
-                    int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
-                    pfrance += x;
+
+                        int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
+                        pusa += x;
+
+                    }
                 }
-
-            }
-            else if (String.Equals(productList[i].PLACES, "uk "))
-            {
-                uk++;
-                wszystkieK++;
-                if (productList[i].BODY != null)
+                else if (String.Equals(productList[i].PLACES, "france "))
                 {
-                    int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
-                    puk += x;
-                }
+                    france++;
+                    wszystkieK++;
+                    if (productList[i].BODY != null)
+                    {
 
-            }
-            else if (String.Equals(productList[i].PLACES, "canada "))
-            {
-                canada++;
-                wszystkieK++;
-                if (productList[i].BODY != null)
+                        int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
+                        pfrance += x;
+                    }
+
+                }
+                else if (String.Equals(productList[i].PLACES, "uk "))
                 {
-                    int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
-                    pcanada += x;
-                }
+                    uk++;
+                    wszystkieK++;
+                    if (productList[i].BODY != null)
+                    {
+                        int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
+                        puk += x;
+                    }
 
-            }
-            else if (String.Equals(productList[i].PLACES, "japan "))
-            {
-                japan++;
-                wszystkieK++;
-                if (productList[i].BODY != null)
+                }
+                else if (String.Equals(productList[i].PLACES, "canada "))
                 {
-                    int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
-                    pjapan += x;
+                    canada++;
+                    wszystkieK++;
+                    if (productList[i].BODY != null)
+                    {
+                        int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
+                        pcanada += x;
+                    }
+
                 }
+                else if (String.Equals(productList[i].PLACES, "japan "))
+                {
+                    japan++;
+                    wszystkieK++;
+                    if (productList[i].BODY != null)
+                    {
+                        int x = productList[i].BODY.Split('.', '?', '!', ' ', ';', ':', ',').Length - 1;
+                        pjapan += x;
+                    }
 
 
+                }
             }
+
         }
-      
     }
 }
