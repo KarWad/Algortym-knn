@@ -7,6 +7,8 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.Threading.Tasks;
+
 
 public class REUTERS
 {
@@ -32,6 +34,7 @@ public class RecursiveFileProcessor
     private static int i;
     private static float[,] SystemTreningowy;
     private static float[,] SystemTestowy;
+    private static object ktoraMetryka;
 
     public static void Main(string[] args)
     {
@@ -73,9 +76,31 @@ public class RecursiveFileProcessor
         Console.ReadLine();
     }
 
+
+    // implementation for floating-point  Manhattan Distance
+    public static float ManhattanDistance(float x1, float x2, float y1, float y2)
+    {
+        return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
+    }
+    // implementation for floating-point EuclideanDistance
+    public static float EuclideanDistance(float x1, float x2, float y1, float y2)
+    {
+        float square = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+        return square;
+    }
+
+    // implementation for floating-point Chebyshev Distance
+    public static float ChebyshevDistance(float dx, float dy)
+    {
+        // not quite sure if the math is correct here
+        return 1 * (dx + dy) + (1 - 2 * 1) * (dx - dy);
+    }
+
+
+
     // Process all files in the directory passed in, recurse on any directories
     // that are found, and process the files they contain.
-    public static void ProcessDirectory(string targetDirectory)
+public static void ProcessDirectory(string targetDirectory)
     {
         // Process the list of files found in the directory.
         string[] fileEntries = Directory.GetFiles(targetDirectory);
@@ -221,10 +246,52 @@ public class RecursiveFileProcessor
             SystemTestowy = wczytajsystem(path);
         }
 
-        private void KtoraMetryka() 
-        {
 
-        } 
+
+
+
+
+
+
+
+
+        float[,] ObliczD (float[,] systemTestowy, float[,] systemTreningowy) 
+        {
+            //Ilość obiektów systemu treningowego będzie teraz ilością kolumn
+            float[,] obliczoneD = new float[systemTestowy.GetLength(0), systemTreningowy.GetLength(0)];
+        
+            for (int i = 0; i < systemTestowy.GetLength(0); i++) 
+            {
+                for (int w = 0; w < systemTreningowy.GetLength(0); w++)
+                {
+                    //Zmienna przechowuje wartośc działania, porównania jednego obiektu systemu treningowego z systemem testowym
+                    float tmp = 0;
+                    for (int ss = 0; ss < systemTestowy.GetLength(0); ss++) 
+                    {
+                        tmp = tmp + EuclideanDistance(systemTestowy[i, ss], systemTreningowy[i, ss], systemTestowy[i, ss], systemTreningowy[w, ss]);
+                        if (tmp < 0) 
+                        {
+                            tmp = tmp * (-1);
+                        }
+                        float tmp2 = ManhattanDistance(systemTestowy[i, ss], systemTreningowy[i, ss], systemTestowy[i, ss], systemTreningowy[w, ss]);
+                        if (tmp2< 0) 
+                        {
+                            tmp2 = tmp2 * (-1);
+                        }
+                        tmp = tmp + tmp2;
+                        float tmp3 = ChebyshevDistance(systemTestowy[i, ss],systemTreningowy[w,ss]);
+                        if (tmp3< 0) 
+                        {
+                            tmp3 = tmp3 * (-1);
+                        }
+                        tmp = tmp+ tmp2 + tmp3;
+                    }
+                    obliczoneD[i, w] = tmp;
+                }
+               
+            }
+            return obliczoneD;
+        }
 
         //-----------------------------------------------------
         int pwestgermany = 0;
