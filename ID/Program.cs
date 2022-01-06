@@ -1,13 +1,11 @@
 ﻿// For Directory.GetFiles and Directory.GetDirectories
 // For File.Exists, Directory.Exists
 using System;
-using System.Linq;
-using System.IO;
-using System.Collections;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using System.Threading.Tasks;
 
 
 public class REUTERS
@@ -17,6 +15,8 @@ public class REUTERS
     public string TOPIC { get; set; }
 
 }
+
+
 
 
 public class RecursiveFileProcessor
@@ -34,116 +34,13 @@ public class RecursiveFileProcessor
     private static int i;
     private static float[,] SystemTreningowy;
     private static float[,] SystemTestowy;
-    private static object ktoraMetryka;
 
-    public static void Main(string[] args)
+
+
+    public  class KNN
     {
-        foreach (string path in args)
-        {
-            if (File.Exists(path))
-            {
-                // This path is a file
-                ProcessFile(path);
-            }
-            else if (Directory.Exists(path))
-            {
-                // This path is a directory
-                ProcessDirectory(path);
-            }
-            else if (!(File.Exists(path) && !Directory.Exists(path)))    // this code runs when all  app args fails
-            {
-                ProcessDirectory(Environment.CurrentDirectory + @"\Reuters");  //just checks %CD%\Reuters
-            }
-            else
-            {
-                Console.WriteLine("{0} is not a valid file or directory.", path);
-            }
-
-
-        }
-
-
-        Console.WriteLine("Ilosc artykulow z West-Germany " + westgermany);
-        Console.WriteLine("Ilosc artykulow z USA " + usa);
-        Console.WriteLine("Ilosc artykulow z France " + france);
-        Console.WriteLine("Ilosc artykulow z UK " + uk);
-        Console.WriteLine("Ilosc artykulow z Canada " + canada);
-        Console.WriteLine("Ilosc artykulow z Japan " + japan);
-        Console.WriteLine("Ilość artykułów razem:" + wszystkieK);
-        Console.ReadLine();
-    }
-
-
-    // implementation for floating-point  Manhattan Distance
-    public static float ManhattanDistance(float x1, float x2, float y1, float y2)
-    {
-        return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
-    }
-    // implementation for floating-point EuclideanDistance
-    public static float EuclideanDistance(float x1, float x2, float y1, float y2)
-    {
-        float square = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-        return square;
-    }
-
-    // implementation for floating-point Chebyshev Distance
-    public static float ChebyshevDistance(float dx, float dy)
-    {
-        // not quite sure if the math is correct here
-        return 1 * (dx + dy) + (1 - 2 * 1) * (dx - dy);
-    }
-
-
-
-    // Process all files in the directory passed in, recurse on any directories
-    // that are found, and process the files they contain.
-    public static void ProcessDirectory(string targetDirectory)
-    {
-        // Process the list of files found in the directory.
-        string[] fileEntries = Directory.GetFiles(targetDirectory);
-        foreach (string fileName in fileEntries)
-        {
-            ProcessFile(fileName);
-        }
-
-        // Recurse into subdirectories of this directory.
-        string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
-        foreach (string subdirectory in subdirectoryEntries)
-            ProcessDirectory(subdirectory);
-    }
-
-
-
-    // Insert logic for processing found files here.
-    public static void ProcessFile(string path)
-    {
-
-        string text = File.ReadAllText(path);
-        text = "<Articles>" + text + "</Articles>";
-        text = text.Replace("<D>", "").Replace("</D>", " ").Replace("<!DOCTYPE lewis SYSTEM \"lewis.dtd\">", "");
-        text = text.Replace("</TEXT>", "");
-        text = Regex.Replace(text, "&#.*?;", string.Empty);
-        text = Regex.Replace(text, "<TEXT.*?>", string.Empty);
-        XmlSerializer serializer = new XmlSerializer(typeof(List<REUTERS>), new XmlRootAttribute("Articles"));
-        StringReader stringReader = new StringReader(text);
-        List<REUTERS> productList = (List<REUTERS>)serializer.Deserialize(stringReader);
-
-        int allp = 0;
-
-        for (int i = 0; i < productList.Count; i++)
-        {
-            if (productList[i].BODY != null)
-            {
-                int x = productList[i].BODY.Split(',').Length - 1;
-                allp += x;
-
-            }
-        }
-        Console.WriteLine(allp);
-
-
         //k-NN
-        float[,] wczytajsystem(string path)
+        public float[,] wczytajsystem(string path)
         {
             float[,] systemdecyzyjny;
             //var odpowiedzialny za czytanie każdej linijki czytanego systemu
@@ -171,7 +68,7 @@ public class RecursiveFileProcessor
         }
         //Metoda która określa maksymalną ilość sąsiadów, którą możemy wybrać do naszego programu
         //Metoda Jakie decyzje zwraca tablice decyzji i ich krotności
-        float[,] Jakiedecyzje(float[,] systemDoWczytywania)
+        public static float[,] Jakiedecyzje(float[,] systemDoWczytywania)
         {
             //lista która przechowuje decyzje w wczytanym systemie
             var listaDecyzji = new List<float>();
@@ -219,7 +116,7 @@ public class RecursiveFileProcessor
 
         }
 
-        void systemTreningowy(string path)
+        private void systemTreningowy(string path)
         {
             //Zapisujemy ścieżkę do pliku
             path = File.ReadAllText(path);
@@ -238,7 +135,7 @@ public class RecursiveFileProcessor
             }
         }
 
-        void systemTestowy(string path)
+        private void systemTestowy(string path)
         {
             path = File.ReadAllText(path);
             SystemTestowy = wczytajsystem(path);
@@ -246,10 +143,10 @@ public class RecursiveFileProcessor
         }
 
 
-        float[,] ObliczD(float[,] systemTestowy, float[,] systemTreningowy)
+       float[,] ObliczD(float[,] systemTestowy, float[,] systemTreningowy)
         {
             //Ilość obiektów systemu treningowego będzie teraz ilością kolumn
-            float[,] obliczoneD = new float[systemTestowy.GetLength(0), systemTreningowy.GetLength(0)];
+         float[,]  obliczoneD = new float[systemTestowy.GetLength(0), systemTreningowy.GetLength(0)];
 
             for (int i = 0; i < systemTestowy.GetLength(0); i++)
             {
@@ -283,7 +180,7 @@ public class RecursiveFileProcessor
             }
             return obliczoneD;
         }
-        float[,] KlasyfikujKNN(float[,] obliczoneD, float kNN)
+        public  float[,] KlasyfikujKNN(float[,] obliczoneD, float kNN)
         {
             //Tablica która przychowuje dane o decyzjach systemu testowego
             float[,] decyzje = Jakiedecyzje(SystemTestowy); //Decyzje 
@@ -406,7 +303,7 @@ public class RecursiveFileProcessor
         }
 
 
-        float[,] SprawdzPoprawnoscKlasyfikacji(float[,] sklasyfikowane)
+        public  float[,] SprawdzPoprawnoscKlasyfikacji(float[,] sklasyfikowane)
         {
             float[,] jakSklasyfikowane = new float[SystemTestowy.GetLength(0), 1];
             for (int i = 0; i < SystemTestowy.GetLength(0); i++)
@@ -427,7 +324,7 @@ public class RecursiveFileProcessor
             return jakSklasyfikowane;
         }
 
-        float[,] MacierzPredykcji(float[,] tablicaPoprawnosci)
+        public float[,] MacierzPredykcji(float[,] tablicaPoprawnosci)
         {
             float[,] decyzje = Jakiedecyzje(SystemTestowy);
             int iloscKolumn = decyzje.GetLength(1);
@@ -440,7 +337,6 @@ public class RecursiveFileProcessor
                 macierzPR[5, i] = decyzje[1, i];
             }
             float calkowitaIloscPoprawnieSklasyfikowanych = 0;
-            float calkowitaIloscSklasyfikowanych = 0;
             float calkowitaIloscChwyconych = 0;
             float iloscObiektow = SystemTestowy.GetLength(0);
             for (int i = 0; i < decyzje.GetLength(1); i++)
@@ -483,20 +379,130 @@ public class RecursiveFileProcessor
             macierzPR[4, 0] = accGlobal;
             macierzPR[4, 1] = covGlobal;
             return macierzPR;
+        }
 
-            void Wyniki()
+        public  void Wyniki()
+    {
+        float[,] obliczoneD = ObliczD(SystemTestowy, SystemTreningowy);
+
+        float[,] sklasyfikowaneDecyzje = KlasyfikujKNN(obliczoneD, k);
+
+        float[,] poprawnoscklasyfikacji = SprawdzPoprawnoscKlasyfikacji(sklasyfikowaneDecyzje);
+
+        float[,] MacierzPred = MacierzPredykcji(poprawnoscklasyfikacji);
+    }
+
+
+    public static void Main(string[] args)
+        {
+            foreach (string path in args)
             {
-                float[,] obliczoneD = ObliczD(SystemTestowy, SystemTreningowy);
-                float[,] sklasyfikowaneDecyzje = KlasyfikujKNN(obliczoneD, k);
-                float[,] poprawnoscklasyfikacji = SprawdzPoprawnoscKlasyfikacji(sklasyfikowaneDecyzje);
-                float[,] MacierzPred = MacierzPredykcji(poprawnoscklasyfikacji);
+                if (File.Exists(path))
+                {
+                    // This path is a file
+                    ProcessFile(path);
+                }
+                else if (Directory.Exists(path))
+                {
+                    // This path is a directory
+                    ProcessDirectory(path);
+                }
+                else if (!(File.Exists(path) && !Directory.Exists(path)))    // this code runs when all  app args fails
+                {
+                    ProcessDirectory(Environment.CurrentDirectory + @"\Reuters");  //just checks %CD%\Reuters
+                }
+                else
+                {
+                    Console.WriteLine("{0} is not a valid file or directory.", path);
+                }
+
+
             }
 
-            float[,] wynik;
+
+            
+
+            Console.WriteLine("Ilosc artykulow z West-Germany " + westgermany);
+            Console.WriteLine("Ilosc artykulow z USA " + usa);
+            Console.WriteLine("Ilosc artykulow z France " + france);
+            Console.WriteLine("Ilosc artykulow z UK " + uk);
+            Console.WriteLine("Ilosc artykulow z Canada " + canada);
+            Console.WriteLine("Ilosc artykulow z Japan " + japan);
+            Console.WriteLine("Ilość artykułów razem:" + wszystkieK);
+            Console.ReadLine();
+        }
+
+
+        // implementation for floating-point  Manhattan Distance
+        public static float ManhattanDistance(float x1, float x2, float y1, float y2)
+        {
+            return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
+        }
+        // implementation for floating-point EuclideanDistance
+        public static float EuclideanDistance(float x1, float x2, float y1, float y2)
+        {
+            float square = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+            return square;
+        }
+
+        // implementation for floating-point Chebyshev Distance
+        public static float ChebyshevDistance(float dx, float dy)
+        {
+            // not quite sure if the math is correct here
+            return 1 * (dx + dy) + (1 - 2 * 1) * (dx - dy);
+        }
 
 
 
+        // Process all files in the directory passed in, recurse on any directories
+        // that are found, and process the files they contain.
+        public static void ProcessDirectory(string targetDirectory)
+        {
+            // Process the list of files found in the directory.
+            string[] fileEntries = Directory.GetFiles(targetDirectory);
+            foreach (string fileName in fileEntries)
+            {
+                ProcessFile(fileName);
+            }
 
+            // Recurse into subdirectories of this directory.
+            string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+            foreach (string subdirectory in subdirectoryEntries)
+                ProcessDirectory(subdirectory);
+        }
+
+        
+
+        // Insert logic for processing found files here.
+        static void ProcessFile(string path)
+        {
+
+            string text = File.ReadAllText(path);
+            text = "<Articles>" + text + "</Articles>";
+            text = text.Replace("<D>", "").Replace("</D>", " ").Replace("<!DOCTYPE lewis SYSTEM \"lewis.dtd\">", "");
+            text = text.Replace("</TEXT>", "");
+            text = Regex.Replace(text, "&#.*?;", string.Empty);
+            text = Regex.Replace(text, "<TEXT.*?>", string.Empty);
+            XmlSerializer serializer = new XmlSerializer(typeof(List<REUTERS>), new XmlRootAttribute("Articles"));
+            StringReader stringReader = new StringReader(text);
+            List<REUTERS> productList = (List<REUTERS>)serializer.Deserialize(stringReader);
+
+            int allp = 0;
+
+            for (int i = 0; i < productList.Count; i++)
+            {
+                if (productList[i].BODY != null)
+                {
+                    int x = productList[i].BODY.Split(',').Length - 1;
+                    allp += x;
+
+                }
+            }
+            KNN knn = new KNN();
+            knn.Wyniki();
+           
+            Console.WriteLine(allp);
+            
 
             //-----------------------------------------------------
             int pwestgermany = 0;
@@ -633,5 +639,6 @@ public class RecursiveFileProcessor
             }
 
         }
+       
     }
 }
