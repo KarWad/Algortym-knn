@@ -32,13 +32,25 @@ public class RecursiveFileProcessor
 
 
     private static int i;
-    private static float[,] SystemTreningowy;
-    private static float[,] SystemTestowy;
+
 
 
 
     public  class KNN
     {
+        public string path;
+        private static float[,] SystemTreningowy;
+        private static float[,] SystemTestowy;
+
+        public KNN(string path)
+        {
+            this.path = path;
+            systemTestowy();
+            systemTreningowy();
+        }
+
+
+
         //k-NN
         public float[,] wczytajsystem(string path)
         {
@@ -58,11 +70,7 @@ public class RecursiveFileProcessor
             {
                 var linia = linie[i].Trim();
                 var liczby = linia.Split();
-                for (int j = 0; j < liczby.Length; j++)
-                {
-                    //Usuwamy puste znaki
-                    systemdecyzyjny[i, j] = float.Parse(liczby[j].Trim());
-                }
+  
             }
             return systemdecyzyjny;
         }
@@ -116,10 +124,9 @@ public class RecursiveFileProcessor
 
         }
 
-        private void systemTreningowy(string path)
+        private void systemTreningowy()
         {
             //Zapisujemy ścieżkę do pliku
-            path = File.ReadAllText(path);
             SystemTreningowy = wczytajsystem(path);
             float kMAX = 0;
             //Ustalamy maksymalną ilość sąsiadów dla któych może działać program
@@ -135,9 +142,8 @@ public class RecursiveFileProcessor
             }
         }
 
-        private void systemTestowy(string path)
+        private void systemTestowy()
         {
-            path = File.ReadAllText(path);
             SystemTestowy = wczytajsystem(path);
 
         }
@@ -498,7 +504,7 @@ public class RecursiveFileProcessor
 
                 }
             }
-            KNN knn = new KNN();
+            KNN knn = new KNN(path);
             knn.Wyniki();
            
             Console.WriteLine(allp);
